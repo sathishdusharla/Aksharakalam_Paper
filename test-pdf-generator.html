@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test PDF Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <h1>Create Test PDF for Aksharakalam</h1>
+    <button onclick="generateTestPDF()">Generate Test PDF</button>
+    
+    <script>
+        function generateTestPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add content to the PDF
+            doc.setFontSize(24);
+            doc.text('Aksharakalam Digital Edition', 20, 30);
+            
+            doc.setFontSize(16);
+            doc.text('Test Newspaper - ' + new Date().toLocaleDateString(), 20, 50);
+            
+            doc.setFontSize(12);
+            doc.text('This is a test PDF file for the Aksharakalam newspaper system.', 20, 70);
+            doc.text('You can use this file to test the upload and viewing functionality.', 20, 85);
+            
+            doc.text('Features to test:', 20, 110);
+            doc.text('• Upload via Admin panel', 30, 125);
+            doc.text('• View in Home page', 30, 140);
+            doc.text('• View in Archive page', 30, 155);
+            doc.text('• Download functionality', 30, 170);
+            
+            doc.text('If you can see this PDF properly, the system is working correctly!', 20, 200);
+            
+            // Save the PDF
+            doc.save('aksharakalam-test.pdf');
+        }
+    </script>
+</body>
+</html>
