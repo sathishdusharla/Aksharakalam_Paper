@@ -112,6 +112,48 @@ const savePapersToIndexedDB = (papers: Paper[]): Promise<void> => {
   });
 };
 
+// Default sample papers for initial load
+const getDefaultPapers = (): Paper[] => {
+  return [
+    {
+      id: 'sample-1',
+      title: 'Aksharakalam Today',
+      date: new Date().toISOString().split('T')[0], // Today's date
+      originalName: 'test-newspaper.pdf',
+      size: 605,
+      fileUrl: '/papers/test-newspaper.pdf',
+      uploadDate: new Date().toISOString(),
+      storedFile: {
+        id: 'sample-1',
+        fileName: 'test-newspaper.pdf',
+        originalName: 'test-newspaper.pdf',
+        type: 'application/pdf',
+        size: 605,
+        uploadDate: new Date().toISOString(),
+        publicPath: '/papers/test-newspaper.pdf'
+      }
+    },
+    {
+      id: 'sample-2',
+      title: 'Aksharakalam Sample Edition',
+      date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Yesterday
+      originalName: 'simple-test.pdf',
+      size: 599,
+      fileUrl: '/papers/simple-test.pdf',
+      uploadDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      storedFile: {
+        id: 'sample-2',
+        fileName: 'simple-test.pdf',
+        originalName: 'simple-test.pdf',
+        type: 'application/pdf',
+        size: 599,
+        uploadDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        publicPath: '/papers/simple-test.pdf'
+      }
+    }
+  ];
+};
+
 export const PaperProvider: React.FC<PaperProviderProps> = ({ children }) => {
   const [papers, setPapers] = useState<Paper[]>([]);
 
@@ -150,7 +192,11 @@ export const PaperProvider: React.FC<PaperProviderProps> = ({ children }) => {
         }
         
         if (!papersLoaded) {
-          console.log('PaperProvider: No papers found in storage');
+          console.log('PaperProvider: No papers found in storage, loading default papers');
+          const defaultPapers = getDefaultPapers();
+          setPapers(defaultPapers);
+          // Save default papers to storage for future use
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultPapers));
         }
       } catch (error) {
         console.error('PaperProvider: Error loading papers from storage:', error);
