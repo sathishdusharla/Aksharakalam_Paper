@@ -7,12 +7,25 @@ import { FileStorageManager } from '../utils/fileStorage';
 const ADMIN_EMAIL = 'aksharakalam@gmail.com';
 const ADMIN_PASSWORD = 'aksharakalam@123';
 
+// Helper function to generate today's paper title
+const generateTodaysPaperTitle = (): string => {
+  const today = new Date();
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
+  const formattedDate = today.toLocaleDateString('en-US', options);
+  return `Aksharakalam - ${formattedDate}`;
+};
+
 const Admin: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [paperTitle, setPaperTitle] = useState('');
+  const [paperTitle, setPaperTitle] = useState(generateTodaysPaperTitle());
   const [paperDate, setPaperDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -37,7 +50,7 @@ const Admin: React.FC = () => {
     setIsLoggedIn(false);
     setEmail('');
     setPassword('');
-    setPaperTitle('');
+    setPaperTitle(generateTodaysPaperTitle());
     setPaperDate(new Date().toISOString().split('T')[0]);
     setSelectedFile(null);
     showNotification('Logged out successfully.', 'info');
@@ -143,7 +156,7 @@ const Admin: React.FC = () => {
       showNotification(`PDF uploaded and saved permanently! File is stored securely in both localStorage and IndexedDB.`, 'success', 4000);
       
       // Reset form
-      setPaperTitle('');
+      setPaperTitle(generateTodaysPaperTitle());
       setPaperDate(new Date().toISOString().split('T')[0]);
       setSelectedFile(null);
       if (fileInputRef.current) {

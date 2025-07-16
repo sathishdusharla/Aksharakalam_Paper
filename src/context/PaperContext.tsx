@@ -163,12 +163,13 @@ export const PaperProvider: React.FC<PaperProviderProps> = ({ children }) => {
     
     const loadPapers = async () => {
       let papersLoaded = false;
+      let parsedPapers: Paper[] = [];
       
       try {
         // Try localStorage first
         const storedPapers = localStorage.getItem(STORAGE_KEY);
         if (storedPapers) {
-          const parsedPapers = JSON.parse(storedPapers);
+          parsedPapers = JSON.parse(storedPapers);
           console.log(`PaperProvider: Found ${parsedPapers.length} papers in localStorage`);
           // Sort by date, newest first
           parsedPapers.sort((a: Paper, b: Paper) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -179,13 +180,23 @@ export const PaperProvider: React.FC<PaperProviderProps> = ({ children }) => {
         // Also try IndexedDB for backup
         try {
           const indexedPapers = await loadPapersFromIndexedDB();
-          if (indexedPapers.length > 0 && (!papersLoaded || indexedPapers.length > 0)) {
+          if (indexedPapers.length > 0) {
             console.log(`PaperProvider: Found ${indexedPapers.length} papers in IndexedDB`);
             indexedPapers.sort((a: Paper, b: Paper) => new Date(b.date).getTime() - new Date(a.date).getTime());
-            setPapers(indexedPapers);
             
-            // Update localStorage with IndexedDB data
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(indexedPapers));
+            // Merge with localStorage papers if any, avoiding duplicates
+            const existingIds = new Set(papersLoaded ? parsedPapers.map((p: Paper) => p.id) : []);
+            const uniqueIndexedPapers = indexedPapers.filter(p => !existingIds.has(p.id));
+            
+            if (uniqueIndexedPapers.length > 0 || !papersLoaded) {
+              const allPapers = papersLoaded ? [...parsedPapers, ...uniqueIndexedPapers] : indexedPapers;
+              allPapers.sort((a: Paper, b: Paper) => new Date(b.date).getTime() - new Date(a.date).getTime());
+              setPapers(allPapers);
+              papersLoaded = true;
+              
+              // Update localStorage with complete data
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(allPapers));
+            }
           }
         } catch (indexedError) {
           console.log('Could not load from IndexedDB:', indexedError);
